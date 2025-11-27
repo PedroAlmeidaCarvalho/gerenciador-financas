@@ -1,0 +1,58 @@
+/* _login.css */
+
+.login-container h2 {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 30px;
+}
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.login-form input {
+    width: 100%; padding: 14px 10px; border: none; border-bottom: 2px solid var(--cor-borda-cinza);
+    background: transparent; color: var(--cor-texto-principal); font-size: 1.1em;
+    font-family: 'Inter', sans-serif; transition: border-color 0.3s ease;
+}
+.login-form input:focus {
+    outline: none; border-color: var(--cor-primary);
+}
+.login-form button {
+    font-size: 1.1em; padding: 14px; cursor: pointer; border: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease;
+    background: var(--cor-primary-gradient); color: white; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.2);
+    margin-top: 10px;
+}
+.login-form button:hover {
+    transform: translateY(-2px); box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+}
+#login-error, #register-error, #forgot-error {
+    color: var(--cor-perigo);
+    text-align: center;
+    margin-top: 15px;
+    font-weight: 600;
+    height: 1.2em; /* Reserva espaço para não pular */
+}
+.login-toggle {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--cor-texto-secundario);
+}
+.login-toggle span {
+    color: var(--cor-primary);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+}
+.forgot-password-link {
+    color: var(--cor-texto-secundario);
+    font-size: 0.9em;
+    text-align: right;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
+.forgot-password-link span {
+    color: var(--cor-primary);
+    cursor: pointer;
+    text-decoration: underline;
+}

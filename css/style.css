@@ -1,0 +1,27 @@
+/* style.css */
+
+/* Importa os estilos base e variáveis */
+@import url("./components/_base.css");
+/* Importa os estilos de Login/Registro */
+@import url("./components/_login.css");
+/* Importa os estilos do Dashboard e Gráficos */
+@import url("./components/_dashboard.css");
+/* Importa os estilos do Formulário e Lista de Transações */
+@import url("./components/_transactions.css");
+
+/* Animação para orçamento estourado */
+@keyframes flash-red {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(255, 71, 87, 0.8);
+        border-color: var(--cor-perigo);
+    }
+    50% {
+        box-shadow: none;
+        border-color: transparent;
+    }
+}
+
+.categoria-circle.over-budget {
+    /* Faz o círculo piscar em vermelho */
+    animation: flash-red 1.5s infinite linear;
+}

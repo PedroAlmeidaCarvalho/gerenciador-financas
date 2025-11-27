@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Finanças</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+   
+</head>
+<body>
+
+    <header class="main-header">
+        <span id="welcome-message"></span>
+        <h1>Gerenciador de Finanças</h1>
+        <button id="btn-logout" style="display: none;">Sair</button>
+    </header>
+
+    <main class="login-container" style="display: none;">
+        <form class="login-form" id="form-login">
+            <h2>Login</h2>
+            <input type="text" id="login-identifier" placeholder="Email ou Nome de Usuário" required>
+            <input type="password" id="login-password" placeholder="Senha" required>
+
+            <p class="forgot-password-link"><span id="toggle-to-forgot">Esqueceu a senha?</span></p>
+
+            <button type="submit">Entrar</button>
+            <p id="login-error"></p>
+            <p class="login-toggle">Não tem uma conta? <span id="toggle-to-register">Registre-se</span></p>
+        </form>
+
+        <form class="login-form" id="form-register" style="display: none;">
+            <h2>Registro</h2>
+            <input type="text" id="register-username" placeholder="Nome de Usuário" required>
+            <input type="email" id="register-email" placeholder="Email" required>
+            <input type="password" id="register-password" placeholder="Nova Senha" required>
+            <button type="submit">Registrar</button>
+            <p id="register-error"></p>
+            <p class="login-toggle">Já tem uma conta? <span id="toggle-to-login">Faça Login</span></p>
+        </form>
+
+        <form class="login-form" id="form-forgot-password" style="display: none;">
+            <h2>Redefinir Senha</h2>
+            <p style="color: var(--cor-texto-secundario); font-size: 0.9em; text-align: center; margin-top: -15px;">Insira seu email ou nome de usuário e uma nova senha.</p>
+            <input type="text" id="forgot-identifier" placeholder="Email ou Nome de Usuário" required>
+            <input type="password" id="forgot-new-password" placeholder="Sua Nova Senha" required>
+            <button type="submit">Redefinir Senha</button>
+            <p id="forgot-error"></p>
+            <p class="login-toggle"><span id="toggle-to-login-from-forgot">Voltar para Login</span></p>
+        </form>
+
+    </main>
+
+    <main class="container" style="display: none;">
+
+        <h2>Defina sua Renda Mensal</h2>
+        <div class="renda-container">
+            <input type="number" id="renda-mensal" placeholder="Digite sua renda total (ex: 3000)">
+            <button id="btn-definir-renda">Definir</button>
+        </div>
+
+        <div class="section-header">
+            <h2>Meu Orçamento</h2>
+            <button id="btn-resetar">Resetar Mês</button>
+        </div>
+
+        <div class="orcamento-visual" id="orcamento-visual">
+
+            <div class="balanco-circle" id="balanco-circle">
+                <div class="balanco-circle-inner">
+                    <h2>Saldo Restante</h2>
+                    <span id="balanco-valor" class="positivo">R$ 0.00</span>
+                </div>
+            </div>
+
+            <div class="categorias-container">
+                <div class="categoria-circle essencial" id="circle-essencial">
+                    <h4>Essenciais (50%)</h4>
+                    <p class="gasto" id="gasto-essencial">R$ 0.00</p>
+                    <p class="meta"><span id="meta-essencial">Meta: R$ 0.00</span></p>
+                </div>
+                <div class="categoria-circle opcional" id="circle-opcional">
+                    <h4>Opcionais (30%)</h4>
+                    <p class="gasto" id="gasto-opcional">R$ 0.00</p>
+                    <p class="meta"><span id="meta-opcional">Meta: R$ 0.00</span></p>
+                </div>
+                <div class="categoria-circle investimento" id="circle-investimento">
+                    <h4>Investimentos (20%)</h4>
+                    <p class="gasto" id="gasto-investimento">R$ 0.00</p>
+                    <p class="meta"><span id="meta-investimento">Meta: R$ 0.00</span></p>
+                </div>
+            </div>
+        </div>
+
+        <form id="form-transacao">
+            <h3>Adicionar Despesa</h3>
+            <input type="hidden" id="edit-id" value="">
+
+            <label for="descricao">Descrição da Despesa</label>
+            <input type="text" id="descricao" placeholder="Ex: Aluguel, Cinema, Ações" required>
+
+            <label for="valor">Valor da Despesa</label>
+            <input type="number" id="valor" placeholder="Ex: 50.00" min="0" step="0.01" required>
+
+            <label for="categoria">Categoria</label>
+            <select id="categoria" required>
+                <option value="">Selecione a categoria</option>
+                <option value="essencial">Essencial (Moradia, Contas, Mercado)</option>
+                <option value="opcional">Opcional (Lazer, Compras, Restaurante)</option>
+                <option value="investimento">Investimento/Poupança (Ações, Fundo, Dívidas)</option>
+            </select>
+
+            <div class="form-botoes">
+                <button type="submit" id="btn-submit">Adicionar Despesa</button>
+                <button type="button" id="btn-cancel-edit">Cancelar</button>
+            </div>
+        </form>
+
+        <h2>Histórico de Despesas</h2>
+        <input type="search" id="input-busca" placeholder="Buscar despesa por descrição...">
+
+        <div class="filtros-container">
+            <input type="number" id="filtro-dia" placeholder="Dia (ex: 5)" min="1" max="31">
+            <input type="number" id="filtro-mes" placeholder="Mês (ex: 11)" min="1" max="12">
+            <input type="number" id="filtro-ano" placeholder="Ano (ex: 2025)" min="2020" max="2100">
+        </div>
+
+        <ul id="lista-transacoes">
+        </ul>
+    </main>
+
+    <script src="js/app.js" type="module"></script>
+    
+</body>
+</html>
