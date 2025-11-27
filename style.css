@@ -1,0 +1,16 @@
+         /* Adicione isso no final do seu CSS */
+@keyframes flash-red {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(255, 71, 87, 0.8);
+        border-color: var(--cor-perigo);
+    }
+    50% {
+        box-shadow: none;
+        border-color: transparent;
+    }
+}
+
+.categoria-circle.over-budget {
+    /* Faz o círculo piscar em vermelho */
+    animation: flash-red 1.5s infinite linear;
+}

@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Finanças</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --cor-fundo: #161a2b;
+            --cor-card-fundo: rgba(31, 35, 61, 0.75);
+            --cor-card-fundo-solido: #1f233d;
+            --cor-fundo-item: #2a2f4c;
+            --cor-primary: #8A2BE2;
+            --cor-primary-gradient: linear-gradient(45deg, #8A2BE2, #4c6fff);
+
+            --cor-essencial: #ff4757;     /* Vermelho */
+            --cor-opcional: #f0c419;      /* Amarelo */
+            --cor-investimento: #00e676; /* Verde */
+
+            --cor-perigo: #ff4757;
+            --cor-texto-principal: #ffffff;
+            --cor-texto-secundario: #a0a0c0;
+            --cor-borda-cinza: #404060;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            padding: 20px;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto-principal);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(76, 111, 255, 0.2), transparent 60%);
+            filter: blur(150px);
+            z-index: -1;
+            opacity: 0.7;
+        }
+        .main-header {
+            width: 100%;
+            max-width: 750px;
+            text-align: center;
+            margin-bottom: 25px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        .main-header h1 {
+            font-size: 2.8em; color: var(--cor-texto-principal);
+            margin: 0; font-weight: 700;
+            text-align: left;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #welcome-message {
+            font-size: 1em;
+            color: var(--cor-texto-secundario);
+            font-weight: 600;
+        }
+        #btn-logout {
+            padding: 8px 14px;
+            background: transparent;
+            color: var(--cor-texto-secundario);
+            border: 2px solid var(--cor-borda-cinza);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        #btn-logout:hover {
+            color: var(--cor-perigo);
+            border-color: var(--cor-perigo);
+        }
+
+        .container h2 { text-align: center; color: var(--cor-texto-secundario); margin-bottom: 10px; font-weight: 600; font-size: 1.5em; }
+        .container h3 { color: var(--cor-texto-secundario); margin-bottom: 15px; font-weight: 600; text-align: left; font-size: 1.2em; }
+
+        .container, .login-container {
+            max-width: 750px;
+            width: 100%;
+            background: var(--cor-card-fundo);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        /* --- Estilos da Tela de Login --- */
+        .login-container h2 {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .login-form input {
+            width: 100%; padding: 14px 10px; border: none; border-bottom: 2px solid var(--cor-borda-cinza);
+            background: transparent; color: var(--cor-texto-principal); font-size: 1.1em;
+            font-family: 'Inter', sans-serif; transition: border-color 0.3s ease;
+        }
+        .login-form input:focus {
+            outline: none; border-color: var(--cor-primary);
+        }
+        .login-form button {
+            font-size: 1.1em; padding: 14px; cursor: pointer; border: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease;
+            background: var(--cor-primary-gradient); color: white; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.2);
+            margin-top: 10px;
+        }
+        .login-form button:hover {
+            transform: translateY(-2px); box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+        }
+        #login-error, #register-error, #forgot-error {
+            color: var(--cor-perigo);
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+            height: 1.2em; /* Reserva espaço para não pular */
+        }
+        .login-toggle {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--cor-texto-secundario);
+        }
+        .login-toggle span {
+            color: var(--cor-primary);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .forgot-password-link {
+            color: var(--cor-texto-secundario);
+            font-size: 0.9em;
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+        .forgot-password-link span {
+            color: var(--cor-primary);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .section-header h2 { margin: 0; text-align: left; }
+        #btn-resetar {
+            padding: 8px 14px;
+            background: transparent;
+            color: var(--cor-perigo);
+            border: 2px solid var(--cor-perigo);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        #btn-resetar:hover { background: var(--cor-perigo); color: var(--cor-texto-principal); transform: translateY(-2px); }
+        .renda-container { display: flex; gap: 15px; margin-bottom: 40px; align-items: center; }
+        .renda-container button {
+            padding: 12px 22px;
+            background: var(--cor-investimento);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 230, 118, 0.2);
+        }
+        .renda-container button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 230, 118, 0.3); }
+        .orcamento-visual { position: relative; display: flex; justify-content: center; align-items: center; min-height: 220px; margin-bottom: 40px; padding: 0 20px; transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        .balanco-circle {
+            position: relative; width: 190px; height: 190px; border-radius: 50%; padding: 10px;
+            background: conic-gradient(var(--cor-borda-cinza) 0% 100%);
+            z-index: 10; cursor: pointer; transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .balanco-circle-inner { width: 100%; height: 100%; border-radius: 50%; background: var(--cor-card-fundo-solido); display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+
+        /* --- [ALTERAÇÃO 1] --- */
+        /* Texto do saldo restante diminuído */
+        .balanco-circle h2 { font-size: 0.9em; margin-bottom: 5px; color: var(--cor-texto-secundario); }
+        .balanco-circle #balanco-valor { font-size: 1.7em; font-weight: 700; }
+
+        #balanco-valor.positivo { color: var(--cor-texto-principal); }
+        #balanco-valor.negativo { color: var(--cor-perigo); }
+
+        .categorias-container { position: absolute; display: flex; align-items: center; gap: 15px; z-index: 5; transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+
+        /* --- [ALTERAÇÃO 2] --- */
+        /* Círculos de categoria aumentados para 145px */
+        .categoria-circle {
+            position: relative; width: 145px; height: 145px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            overflow: hidden;
+            border: 2px solid transparent;
+            opacity: 0; transform: scale(0.5); transition: all 0.5s ease; text-align: center;
+        }
+
+        .categoria-circle:hover {
+            transform: scale(1.05);
+            border-color: transparent;
+            filter: brightness(1.15);
+        }
+
+        .categoria-circle.essencial { background-color: var(--cor-essencial); }
+        .categoria-circle.opcional { background-color: var(--cor-opcional); }
+        .categoria-circle.investimento { background-color: var(--cor-investimento); }
+
+        .categoria-circle::before {
+            content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 50%;
+            border: 3px solid transparent; z-index: 1;
+            background: conic-gradient(transparent 0% 0%, var(--cor-borda-progresso) 0% 0%);
+        }
+        .categoria-circle h4 {
+            margin: 5px 0 0 0; font-size: 0.95em;
+            color: #000000;
+            font-weight: 700;
+            z-index: 2;
+        }
+        .categoria-circle .gasto {
+            font-weight: 700; font-size: 1.4em; margin: 4px 0; z-index: 2;
+            color: #000000;
+        }
+        .categoria-circle .meta {
+            font-size: 0.85em;
+            color: #000000;
+            z-index: 2; margin: 0 0 5px 0;
+            font-weight: 600;
+        }
+
+        /* --- [ALTERAÇÃO 3] --- */
+        /* Transforms da animação ajustados para 145px */
+        .orcamento-visual.ativo .balanco-circle { transform: translateX(-223.75px); }
+        .orcamento-visual.ativo .categorias-container { transform: translateX(133.75px); }
+        /* --- Fim das Alterações --- */
+
+        .orcamento-visual.ativo .categoria-circle { opacity: 1; transform: scale(1); }
+        .orcamento-visual.ativo .categoria-circle:nth-child(1) { transition-delay: 0.1s; }
+        .orcamento-visual.ativo .categoria-circle:nth-child(2) { transition-delay: 0.2s; }
+        .orcamento-visual.ativo .categoria-circle:nth-child(3) { transition-delay: 0.3s; }
+        form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px; background: rgba(0,0,0,0.15); padding: 25px; border-radius: 16px; }
+        form label { grid-column: 1 / -1; margin-bottom: -10px; color: var(--cor-texto-secundario); font-size: 0.9em; font-weight: 600; }
+        .renda-container input, form input, form select {
+            width: 100%; padding: 12px 5px; border: none; border-bottom: 2px solid var(--cor-borda-cinza);
+            background: transparent; color: var(--cor-texto-principal); font-size: 1.1em;
+            font-family: 'Inter', sans-serif; transition: border-color 0.3s ease;
+        }
+        form input:focus, form select:focus, .renda-container input:focus { outline: none; border-color: var(--cor-primary); }
+        form select { grid-column: 1 / -1; color: var(--cor-texto-secundario); }
+
+        form select.essencial { color: var(--cor-essencial); border-bottom-color: var(--cor-essencial); }
+        form select.opcional { color: var(--cor-opcional); border-bottom-color: var(--cor-opcional); }
+        form select.investimento { color: var(--cor-investimento); border-bottom-color: var(--cor-investimento); }
+        form select option[value=""] { color: var(--cor-texto-secundario); }
+        form select option[value="essencial"] { color: var(--cor-essencial); background: var(--cor-fundo-item); }
+        form select option[value="opcional"] { color: var(--cor-opcional); background: var(--cor-fundo-item); }
+        form select option[value="investimento"] { color: var(--cor-investimento); background: var(--cor-fundo-item); }
+
+        .form-botoes { grid-column: 1 / -1; display: flex; gap: 10px; margin-top: 10px; }
+        .form-botoes button { flex: 1; font-size: 1.1em; padding: 14px; cursor: pointer; border: none; border-radius: 8px; font-weight: 600; transition: all 0.3s ease; }
+        #btn-submit { background: var(--cor-primary-gradient); color: white; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.2); }
+        #btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4); }
+        #btn-cancel-edit { background-color: var(--cor-borda-cinza); color: var(--cor-texto-secundario); display: none; }
+        #btn-cancel-edit:hover { background-color: #505070; color: var(--cor-texto-principal); }
+        form.edit-mode #btn-submit { background: linear-gradient(45deg, var(--cor-opcional), #ffd700); color: #333; box-shadow: 0 4px 15px rgba(240, 196, 25, 0.3); }
+        form.edit-mode #btn-submit:hover { box-shadow: 0 6px 20px rgba(240, 196, 25, 0.4); }
+        form.edit-mode #btn-cancel-edit { display: block; }
+
+        #input-busca {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border: 2px solid var(--cor-borda-cinza);
+            background-color: var(--cor-fundo-item);
+            color: var(--cor-texto-principal);
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+        #input-busca:focus {
+            outline: none;
+            border-color: var(--cor-primary);
+            background-color: var(--cor-card-fundo-solido);
+        }
+
+        .filtros-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filtros-container input::-webkit-outer-spin-button,
+        .filtros-container input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .filtros-container input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .filtros-container input {
+            padding: 12px 10px;
+            border: 2px solid var(--cor-borda-cinza);
+            background-color: var(--cor-fundo-item);
+            color: var(--cor-texto-principal);
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .filtros-container input:focus {
+            outline: none;
+            border-color: var(--cor-primary);
+            background-color: var(--cor-card-fundo-solido);
+        }
+
+        ul { list-style-type: none; padding: 0; }
+        li {
+            background: var(--cor-fundo-item); padding: 15px 20px; margin-bottom: 10px; border-radius: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid transparent; border-left: 5px solid; transition: all 0.3s ease;
+        }
+        li:hover { transform: translateX(5px); background: var(--cor-card-fundo-solido); border-color: var(--cor-borda-cinza); }
+        li .transacao-info { flex: 1; }
+        li .transacao-info span { display: block; }
+
+        li .transacao-info .transacao-descricao {
+            font-weight: 600;
+            font-size: 1.05em;
+            margin-bottom: 4px;
+        }
+        li .transacao-info .transacao-valor { font-weight: 600; font-size: 1.1em; }
+
+        li .transacao-info .transacao-data {
+            font-size: 0.85em;
+            color: var(--cor-texto-secundario);
+            margin-top: 5px;
+        }
+
+        li.essencial { border-left-color: var(--cor-essencial); }
+        li.essencial .transacao-valor,
+        li.essencial .transacao-descricao {
+            color: var(--cor-essencial);
+        }
+
+        li.opcional { border-left-color: var(--cor-opcional); }
+        li.opcional .transacao-valor,
+        li.opcional .transacao-descricao {
+            color: var(--cor-opcional);
+        }
+
+        li.investimento { border-left-color: var(--cor-investimento); }
+        li.investimento .transacao-valor,
+        li.investimento .transacao-descricao {
+            color: var(--cor-investimento);
+        }
+
+        .transacao-acoes { display: flex; align-items: center; gap: 8px; }
+        .btn-edit, .btn-delete {
+            background: transparent; border: none; cursor: pointer; padding: 5px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
+        }
+        .btn-edit svg, .btn-delete svg { width: 18px; height: 18px; stroke-width: 2; }
+        .btn-edit svg { stroke: var(--cor-opcional); }
+        .btn-edit:hover { background-color: rgba(240, 196, 25, 0.1); transform: scale(1.1); }
+        .btn-delete svg { stroke: var(--cor-perigo); }
+        .btn-delete:hover { background-color: rgba(255, 71, 87, 0.1); transform: scale(1.1); }
+
+        @keyframes fillCircle {
+            from { background: conic-gradient(transparent var(--fill-percentage, 0deg) 360deg, var(--cor-borda-progresso) 0deg var(--fill-percentage, 0deg)); }
+            to { background: conic-gradient(transparent 0deg var(--fill-percentage, 0deg), var(--cor-borda-progresso) var(--fill-percentage, 0deg) 360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            .container, .login-container { padding: 25px; }
+            .main-header {
+                font-size: 1.5em;
+                margin-top: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            .main-header h1 {
+                font-size: 1.8em;
+                position: static;
+                transform: none;
+                text-align: center;
+                width: 100%;
+                order: -1;
+            }
+            #welcome-message { order: 1; }
+            #btn-logout { order: 2; }
+
+            .orcamento-visual.ativo { flex-direction: column; min-height: 400px; gap: 20px; }
+            .orcamento-visual.ativo .balanco-circle, .orcamento-visual.ativo .categorias-container { transform: translateX(0); }
+            .orcamento-visual.ativo .categorias-container { position: relative; justify-content: center; flex-wrap: wrap; width: 100%; }
+            form { grid-template-columns: 1fr; }
+            .filtros-container { grid-template-columns: 1fr 1fr 1fr; }
+            .filtros-container input { font-size: 0.9em; padding: 10px 5px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <span id="welcome-message"></span>
+        <h1>Gerenciador de Finanças</h1>
+        <button id="btn-logout" style="display: none;">Sair</button>
+    </header>
+
+    <main class="login-container" style="display: none;">
+        <form class="login-form" id="form-login">
+            <h2>Login</h2>
+            <input type="text" id="login-identifier" placeholder="Email ou Nome de Usuário" required>
+            <input type="password" id="login-password" placeholder="Senha" required>
+
+            <p class="forgot-password-link"><span id="toggle-to-forgot">Esqueceu a senha?</span></p>
+
+            <button type="submit">Entrar</button>
+            <p id="login-error"></p>
+            <p class="login-toggle">Não tem uma conta? <span id="toggle-to-register">Registre-se</span></p>
+        </form>
+
+        <form class="login-form" id="form-register" style="display: none;">
+            <h2>Registro</h2>
+            <input type="text" id="register-username" placeholder="Nome de Usuário" required>
+            <input type="email" id="register-email" placeholder="Email" required>
+            <input type="password" id="register-password" placeholder="Nova Senha" required>
+            <button type="submit">Registrar</button>
+            <p id="register-error"></p>
+            <p class="login-toggle">Já tem uma conta? <span id="toggle-to-login">Faça Login</span></p>
+        </form>
+
+        <form class="login-form" id="form-forgot-password" style="display: none;">
+            <h2>Redefinir Senha</h2>
+            <p style="color: var(--cor-texto-secundario); font-size: 0.9em; text-align: center; margin-top: -15px;">Insira seu email ou nome de usuário e uma nova senha.</p>
+            <input type="text" id="forgot-identifier" placeholder="Email ou Nome de Usuário" required>
+            <input type="password" id="forgot-new-password" placeholder="Sua Nova Senha" required>
+            <button type="submit">Redefinir Senha</button>
+            <p id="forgot-error"></p>
+            <p class="login-toggle"><span id="toggle-to-login-from-forgot">Voltar para Login</span></p>
+        </form>
+
+    </main>
+
+    <main class="container" style="display: none;">
+
+        <h2>Defina sua Renda Mensal</h2>
+        <div class="renda-container">
+            <input type="number" id="renda-mensal" placeholder="Digite sua renda total (ex: 3000)">
+            <button id="btn-definir-renda">Definir</button>
+        </div>
+
+        <div class="section-header">
+            <h2>Meu Orçamento</h2>
+            <button id="btn-resetar">Resetar Mês</button>
+        </div>
+
+        <div class="orcamento-visual" id="orcamento-visual">
+
+            <div class="balanco-circle" id="balanco-circle">
+                <div class="balanco-circle-inner">
+                    <h2>Saldo Restante</h2>
+                    <span id="balanco-valor" class="positivo">R$ 0.00</span>
+                </div>
+            </div>
+
+            <div class="categorias-container">
+                <div class="categoria-circle essencial" id="circle-essencial">
+                    <h4>Essenciais (50%)</h4>
+                    <p class="gasto" id="gasto-essencial">R$ 0.00</p>
+                    <p class="meta"><span id="meta-essencial">Meta: R$ 0.00</span></p>
+                </div>
+                <div class="categoria-circle opcional" id="circle-opcional">
+                    <h4>Opcionais (30%)</h4>
+                    <p class="gasto" id="gasto-opcional">R$ 0.00</p>
+                    <p class="meta"><span id="meta-opcional">Meta: R$ 0.00</span></p>
+                </div>
+                <div class="categoria-circle investimento" id="circle-investimento">
+                    <h4>Investimentos (20%)</h4>
+                    <p class="gasto" id="gasto-investimento">R$ 0.00</p>
+                    <p class="meta"><span id="meta-investimento">Meta: R$ 0.00</span></p>
+                </div>
+            </div>
+        </div>
+
+        <form id="form-transacao">
+            <h3>Adicionar Despesa</h3>
+            <input type="hidden" id="edit-id" value="">
+
+            <label for="descricao">Descrição da Despesa</label>
+            <input type="text" id="descricao" placeholder="Ex: Aluguel, Cinema, Ações" required>
+
+            <label for="valor">Valor da Despesa</label>
+            <input type="number" id="valor" placeholder="Ex: 50.00" min="0" step="0.01" required>
+
+            <label for="categoria">Categoria</label>
+            <select id="categoria" required>
+                <option value="">Selecione a categoria</option>
+                <option value="essencial">Essencial (Moradia, Contas, Mercado)</option>
+                <option value="opcional">Opcional (Lazer, Compras, Restaurante)</option>
+                <option value="investimento">Investimento/Poupança (Ações, Fundo, Dívidas)</option>
+            </select>
+
+            <div class="form-botoes">
+                <button type="submit" id="btn-submit">Adicionar Despesa</button>
+                <button type="button" id="btn-cancel-edit">Cancelar</button>
+            </div>
+        </form>
+
+        <h2>Histórico de Despesas</h2>
+        <input type="search" id="input-busca" placeholder="Buscar despesa por descrição...">
+
+        <div class="filtros-container">
+            <input type="number" id="filtro-dia" placeholder="Dia (ex: 5)" min="1" max="31">
+            <input type="number" id="filtro-mes" placeholder="Mês (ex: 11)" min="1" max="12">
+            <input type="number" id="filtro-ano" placeholder="Ano (ex: 2025)" min="2020" max="2100">
+        </div>
+
+        <ul id="lista-transacoes">
+        </ul>
+    </main>
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- Seletores de Login/Registro ---
+    const loginContainer = document.querySelector('.login-container');
+    const mainContainer = document.querySelector('.container');
+    const formLogin = document.getElementById('form-login');
+    const formRegister = document.getElementById('form-register');
+    const formForgotPassword = document.getElementById('form-forgot-password');
+
+    const toggleToRegister = document.getElementById('toggle-to-register');
+    const toggleToLogin = document.getElementById('toggle-to-login');
+    const toggleToForgot = document.getElementById('toggle-to-forgot');
+    const toggleToLoginFromForgot = document.getElementById('toggle-to-login-from-forgot');
+
+    const loginError = document.getElementById('login-error');
+    const registerError = document.getElementById('register-error');
+    const forgotError = document.getElementById('forgot-error');
+
+    const btnLogout = document.getElementById('btn-logout');
+    const welcomeMessage = document.getElementById('welcome-message');
+
+    const loginIdentifierInput = document.getElementById('login-identifier');
+    const loginPasswordInput = document.getElementById('login-password');
+    const registerUsernameInput = document.getElementById('register-username');
+    const registerEmailInput = document.getElementById('register-email');
+    const registerPasswordInput = document.getElementById('register-password');
+    const forgotIdentifierInput = document.getElementById('forgot-identifier');
+    const forgotNewPasswordInput = document.getElementById('forgot-new-password');
+
+
+    // --- Seletores do App Principal ---
+    const rendaInput = document.getElementById('renda-mensal');
+    const btnDefinirRenda = document.getElementById('btn-definir-renda');
+    const btnResetar = document.getElementById('btn-resetar');
+    const orcamentoVisual = document.getElementById('orcamento-visual');
+    const balancoCircle = document.getElementById('balanco-circle');
+    const balancoValor = document.getElementById('balanco-valor');
+    const metaEssencialEl = document.getElementById('meta-essencial');
+    const metaOpcionalEl = document.getElementById('meta-opcional');
+    const metaInvestimentoEl = document.getElementById('meta-investimento');
+    const gastoEssencialEl = document.getElementById('gasto-essencial');
+    const gastoOpcionalEl = document.getElementById('gasto-opcional');
+    const gastoInvestimentoEl = document.getElementById('gasto-investimento');
+    const circleEssencial = document.getElementById('circle-essencial');
+    const circleOpcional = document.getElementById('circle-opcional');
+    const circleInvestimento = document.getElementById('circle-investimento');
+    const form = document.getElementById('form-transacao');
+    const editIdInput = document.getElementById('edit-id');
+    const descricaoInput = document.getElementById('descricao');
+    const valorInput = document.getElementById('valor');
+    const categoriaSelect = document.getElementById('categoria');
+    const listaTransacoes = document.getElementById('lista-transacoes');
+    const btnSubmit = document.getElementById('btn-submit');
+    const btnCancelEdit = document.getElementById('btn-cancel-edit');
+    const buscaInput = document.getElementById('input-busca');
+    const filtroDia = document.getElementById('filtro-dia');
+    const filtroMes = document.getElementById('filtro-mes');
+    const filtroAno = document.getElementById('filtro-ano');
+
+    // --- Chaves de Armazenamento ---
+    const USERS_DB_KEY = 'financasAppUsers';
+    const CURRENT_USER_KEY = 'financasAppCurrentUser';
+    let STORAGE_KEY;
+
+    // --- Estado da Aplicação ---
+    let currentUser = null;
+    let rendaTotal = 0.00;
+    let gastoTotal = 0.00;
+    let gastosPorCategoria = { essencial: 0.00, opcional: 0.00, investimento: 0.00 };
+    let transacoes = [];
+
+    // --- Funções de Login/Registro ---
+    function showLoginScreen() {
+        loginContainer.style.display = 'block';
+        mainContainer.style.display = 'none';
+        btnLogout.style.display = 'none';
+        welcomeMessage.textContent = '';
+        loginError.textContent = '';
+        registerError.textContent = '';
+        forgotError.textContent = '';
+
+        formLogin.style.display = 'flex';
+        formRegister.style.display = 'none';
+        formForgotPassword.style.display = 'none';
+    }
+
+    function showAppScreen(username) {
+        currentUser = username;
+        STORAGE_KEY = `financasAppDados_${username}`;
+        localStorage.setItem(CURRENT_USER_KEY, username);
+
+        loginContainer.style.display = 'none';
+        mainContainer.style.display = 'block';
+        btnLogout.style.display = 'block';
+        welcomeMessage.textContent = `Olá, ${username}!`;
+
+        loadData();
+        atualizarTudo();
+        filtrarDespesas();
+    }
+
+    function handleRegister(e) {
+        e.preventDefault();
+        const username = registerUsernameInput.value;
+        const email = registerEmailInput.value;
+        const password = registerPasswordInput.value;
+
+        if (!username || !email || !password) {
+            registerError.textContent = 'Todos os campos são obrigatórios.';
+            return;
+        }
+
+        let users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+
+        if (users.find(user => user.username === username)) {
+            registerError.textContent = 'Este nome de usuário já existe.';
+            return;
+        }
+        if (users.find(user => user.email === email)) {
+            registerError.textContent = 'Este email já está em uso.';
+            return;
+        }
+
+        users.push({ username, email, password });
+        localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+
+        alert('Usuário registrado com sucesso! Faça o login.');
+        formRegister.style.display = 'none';
+        formForgotPassword.style.display = 'none';
+        formLogin.style.display = 'flex';
+        loginError.textContent = '';
+        registerError.textContent = '';
+    }
+
+    function handleLogin(e) {
+        e.preventDefault();
+        const identifier = loginIdentifierInput.value;
+        const password = loginPasswordInput.value;
+
+        let users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+
+        const user = users.find(user =>
+            (user.email === identifier || user.username === identifier)
+        );
+
+        if (user && user.password === password) {
+            showAppScreen(user.username);
+        } else {
+            loginError.textContent = 'Email, usuário ou senha inválidos.';
+        }
+    }
+
+    function handleForgotPassword(e) {
+        e.preventDefault();
+        const identifier = forgotIdentifierInput.value;
+        const newPassword = forgotNewPasswordInput.value;
+
+        if (!identifier || !newPassword) {
+            forgotError.textContent = 'Todos os campos são obrigatórios.';
+            return;
+        }
+
+        let users = JSON.parse(localStorage.getItem(USERS_DB_KEY)) || [];
+
+        const userIndex = users.findIndex(user =>
+            user.email === identifier || user.username === identifier
+        );
+
+        if (userIndex > -1) {
+            users[userIndex].password = newPassword;
+            localStorage.setItem(USERS_DB_KEY, JSON.stringify(users));
+
+            alert('Senha redefinida com sucesso! Faça o login com sua nova senha.');
+
+            formForgotPassword.style.display = 'none';
+            formRegister.style.display = 'none';
+            formLogin.style.display = 'flex';
+            loginError.textContent = '';
+            forgotError.textContent = '';
+        } else {
+            forgotError.textContent = 'Email ou Nome de Usuário não encontrado.';
+        }
+    }
+
+    function handleLogout() {
+        localStorage.removeItem(CURRENT_USER_KEY);
+        currentUser = null;
+        STORAGE_KEY = null;
+
+        rendaTotal = 0.00;
+        gastoTotal = 0.00;
+        gastosPorCategoria = { essencial: 0.00, opcional: 0.00, investimento: 0.00 };
+        transacoes = [];
+
+        listaTransacoes.innerHTML = '';
+        rendaInput.value = '';
+        buscaInput.value = '';
+        filtroDia.value = '';
+        filtroMes.value = '';
+        filtroAno.value = '';
+
+        atualizarTudo();
+
+        showLoginScreen();
+    }
+
+    // --- Funções de Persistência ---
+    function saveData() {
+        if (!STORAGE_KEY) return;
+        const dados = { rendaTotal, gastoTotal, gastosPorCategoria, transacoes };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    }
+
+    function loadData() {
+        if (!STORAGE_KEY) return;
+
+        listaTransacoes.innerHTML = '';
+        transacoes = [];
+
+        const dadosSalvos = localStorage.getItem(STORAGE_KEY);
+        if (dadosSalvos) {
+            const dados = JSON.parse(dadosSalvos);
+            rendaTotal = dados.rendaTotal || 0.00;
+            gastoTotal = dados.gastoTotal || 0.00;
+            gastosPorCategoria = dados.gastosPorCategoria || { essencial: 0, opcional: 0, investimento: 0 };
+            transacoes = dados.transacoes || [];
+            if (rendaTotal > 0) rendaInput.value = rendaTotal;
+            transacoes.sort((a, b) => b.id - a.id).forEach(adicionarDespesaDOM);
+        } else {
+            rendaTotal = 0.00;
+            gastoTotal = 0.00;
+            gastosPorCategoria = { essencial: 0.00, opcional: 0.00, investimento: 0.00 };
+            transacoes = [];
+            rendaInput.value = '';
+        }
+    }
+
+    // --- Funções de Formatação e Filtro ---
+    function formatarData(timestamp) {
+        if (!timestamp) return '';
+        const data = new Date(timestamp);
+        const options = {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        };
+        return data.toLocaleString('pt-BR', options).replace(',', ' -');
+    }
+
+    function filtrarDespesas() {
+        const termoBusca = buscaInput.value.toLowerCase();
+        const diaFiltro = filtroDia.value;
+        const mesFiltro = filtroMes.value;
+        const anoFiltro = filtroAno.value;
+
+        const itens = listaTransacoes.querySelectorAll('li');
+
+        itens.forEach(item => {
+            const descricao = item.querySelector('.transacao-descricao').textContent.toLowerCase();
+            const timestamp = item.dataset.timestamp;
+
+            let matchDesc = true;
+            let matchDia = true;
+            let matchMes = true;
+            let matchAno = true;
+
+            if (termoBusca) {
+                matchDesc = descricao.includes(termoBusca);
+            }
+
+            if (timestamp) {
+                const dataItem = new Date(parseInt(timestamp));
+                const diaItem = dataItem.getDate();
+                const mesItem = dataItem.getMonth() + 1;
+                const anoItem = dataItem.getFullYear();
+
+                if (diaFiltro) {
+                    matchDia = (diaItem == diaFiltro);
+                }
+                if (mesFiltro) {
+                    matchMes = (mesItem == mesFiltro);
+                }
+                if (anoFiltro) {
+                    matchAno = (anoItem == anoFiltro);
+                }
+            }
+
+            if (matchDesc && matchDia && matchMes && matchAno) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    // --- Funções Principais da Aplicação ---
+    function definirRenda() {
+        const renda = parseFloat(rendaInput.value);
+        if (isNaN(renda) || renda <= 0) return alert('Por favor, insira um valor de renda válido.');
+        rendaTotal = renda;
+        if (transacoes.length > 0 && confirm("Você definiu uma nova renda. Deseja limpar as transações do mês anterior?")) {
+            resetarMes(false);
+        }
+        atualizarTudo();
+    }
+
+    function handleFormSubmit(e) {
+        e.preventDefault();
+        const idEdicao = editIdInput.value;
+        idEdicao ? salvarEdicao(parseInt(idEdicao)) : adicionarDespesa();
+    }
+
+    function adicionarDespesa() {
+        const descricao = descricaoInput.value;
+        const valor = parseFloat(valorInput.value);
+        const categoria = categoriaSelect.value;
+        const timestamp = Date.now();
+
+        if (descricao.trim() === '' || isNaN(valor) || valor <= 0 || categoria === '') return alert('Por favor, preencha todos os campos corretamente.');
+        if (rendaTotal <= 0) return alert('Por favor, defina sua renda mensal primeiro.');
+
+        const despesa = { id: timestamp, timestamp: timestamp, descricao, valor, categoria };
+
+        transacoes.unshift(despesa);
+        gastoTotal += valor;
+        gastosPorCategoria[categoria] += valor;
+
+        adicionarDespesaDOM(despesa);
+        atualizarTudo();
+        limparFormulario();
+        filtrarDespesas();
+    }
+
+    function iniciarEdicao(id) {
+        const transacao = transacoes.find(t => t.id === id);
+        if (!transacao) return;
+
+        form.classList.add('edit-mode');
+        editIdInput.value = transacao.id;
+        descricaoInput.value = transacao.descricao;
+        valorInput.value = transacao.valor;
+        categoriaSelect.value = transacao.categoria;
+        categoriaSelect.className = transacao.categoria;
+        btnSubmit.textContent = 'Salvar Edição';
+        form.scrollIntoView({ behavior: 'smooth' });
+        descricaoInput.focus();
+    }
+
+    function salvarEdicao(id) {
+        const transacao = transacoes.find(t => t.id === id);
+        if (!transacao) return;
+
+        const valorAntigo = transacao.valor;
+        const categoriaAntiga = transacao.categoria;
+        const novoValor = parseFloat(valorInput.value);
+        const novaCategoria = categoriaSelect.value;
+        const novaDescricao = descricaoInput.value;
+
+        if (novaDescricao.trim() === '' || isNaN(novoValor) || novoValor <= 0 || novaCategoria === '') return alert('Por favor, preencha todos os campos corretamente.');
+
+        gastoTotal = (gastoTotal - valorAntigo) + novoValor;
+        gastosPorCategoria[categoriaAntiga] -= valorAntigo;
+        gastosPorCategoria[novaCategoria] += novoValor;
+
+        transacao.valor = novoValor;
+        transacao.categoria = novaCategoria;
+        transacao.descricao = novaDescricao;
+
+        const itemLi = document.querySelector(`.btn-edit[data-id="${id}"]`).closest('li');
+        itemLi.className = novaCategoria;
+        itemLi.querySelector('.transacao-info .transacao-descricao').textContent = novaDescricao;
+        itemLi.querySelector('.transacao-info .transacao-valor').textContent = `- R$ ${novoValor.toFixed(2)}`;
+
+        cancelarEdicao();
+        atualizarTudo();
+        filtrarDespesas();
+    }
+
+    function cancelarEdicao() {
+        form.classList.remove('edit-mode');
+        editIdInput.value = '';
+        btnSubmit.textContent = 'Adicionar Despesa';
+        categoriaSelect.className = '';
+        limparFormulario();
+    }
+
+    function limparFormulario() {
+        form.reset();
+        categoriaSelect.className = '';
+        descricaoInput.focus();
+    }
+
+    function excluirTransacao(id) {
+        const transacao = transacoes.find(t => t.id === id);
+        if (!transacao) return;
+
+        gastoTotal -= transacao.valor;
+        gastosPorCategoria[transacao.categoria] -= transacao.valor;
+        transacoes = transacoes.filter(t => t.id !== id);
+        document.querySelector(`.btn-delete[data-id="${id}"]`).closest('li').remove();
+        atualizarTudo();
+    }
+
+    function resetarMes(confirmar = true) {
+        if (confirmar && !confirm('Você tem certeza que deseja resetar o mês? Todas as suas despesas serão apagadas.')) return;
+
+        gastoTotal = 0.00;
+        gastosPorCategoria = { essencial: 0.00, opcional: 0.00, investimento: 0.00 };
+        transacoes = [];
+        listaTransacoes.innerHTML = '';
+
+        buscaInput.value = '';
+        filtroDia.value = '';
+        filtroMes.value = '';
+        filtroAno.value = '';
+
+        atualizarTudo();
+        cancelarEdicao();
+    }
+
+    // --- Funções de DOM ---
+    function adicionarDespesaDOM(despesa) {
+        const item = document.createElement('li');
+        item.className = despesa.categoria;
+        item.dataset.timestamp = despesa.timestamp;
+
+        const dataFormatada = formatarData(despesa.timestamp || despesa.id);
+
+        item.innerHTML = `
+            <div class="transacao-info">
+                <span class="transacao-descricao">${despesa.descricao}</span>
+                <span class="transacao-valor">- R$ ${despesa.valor.toFixed(2)}</span>
+                <span class="transacao-data">${dataFormatada}</span>
+            </div>
+            <div class="transacao-acoes">
+                <button class="btn-edit" data-id="${despesa.id}" title="Editar">
+                    <svg fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4L18.5 2.5z"></path></svg>
+                </button>
+                <button class="btn-delete" data-id="${despesa.id}" title="Excluir">
+                    <svg fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </button>
+            </div>`;
+        listaTransacoes.prepend(item);
+    }
+
+    function atualizarTudo() {
+        metaEssencialEl.textContent = `Meta: R$ ${(rendaTotal * 0.50).toFixed(2)}`;
+        metaOpcionalEl.textContent = `Meta: R$ ${(rendaTotal * 0.30).toFixed(2)}`;
+        metaInvestimentoEl.textContent = `Meta: R$ ${(rendaTotal * 0.20).toFixed(2)}`;
+
+        const saldoRestante = rendaTotal - gastoTotal;
+        balancoValor.textContent = `R$ ${saldoRestante.toFixed(2)}`;
+        balancoValor.className = saldoRestante >= 0 ? 'positivo' : 'negativo';
+
+        gastoEssencialEl.textContent = `R$ ${gastosPorCategoria.essencial.toFixed(2)}`;
+        gastoOpcionalEl.textContent = `R$ ${gastosPorCategoria.opcional.toFixed(2)}`;
+        gastoInvestimentoEl.textContent = `R$ ${gastosPorCategoria.investimento.toFixed(2)}`;
+
+        atualizarBordaBalanco();
+        atualizarBordasCategorias();
+        saveData();
+    }
+
+    // --- Funções do Dashboard (Gráficos) ---
+    function updateCircleProgress(element, percentage, color) {
+        const progress = Math.min(100, Math.max(0, percentage));
+        const fillDegree = (progress / 100) * 360;
+        element.style.setProperty('--fill-percentage', `${fillDegree}deg`);
+        element.style.setProperty('--cor-borda-progresso', color);
+    }
+
+    function animarBordasPequenas() {
+        [circleEssencial, circleOpcional, circleInvestimento].forEach(circle => {
+            circle.style.animation = 'none';
+            circle.offsetHeight;
+            circle.style.animation = `fillCircle 0.5s ease-out forwards`;
+        });
+    }
+
+    function atualizarBordaBalanco() {
+        if (gastoTotal === 0) {
+            balancoCircle.style.background = 'var(--cor-borda-cinza)';
+            return;
+        }
+        const pEssencial = (gastosPorCategoria.essencial / gastoTotal) * 360;
+        const pOpcional = (gastosPorCategoria.opcional / gastoTotal) * 360;
+        const grauEssencial = pEssencial;
+        const grauOpcional = pEssencial + pOpcional;
+
+        balancoCircle.style.background = `conic-gradient(
+            var(--cor-essencial) 0deg ${grauEssencial}deg,
+            var(--cor-opcional) ${grauEssencial}deg ${grauOpcional}deg,
+            var(--cor-investimento) ${grauOpcional}deg 360deg
+        )`;
+    }
+
+    function atualizarBordasCategorias() {
+        if (rendaTotal > 0) {
+            const metaEssencial = rendaTotal * 0.50;
+            const percentEssencial = metaEssencial > 0 ? (gastosPorCategoria.essencial / metaEssencial) * 100 : 0;
+            updateCircleProgress(circleEssencial, percentEssencial, 'var(--cor-essencial)');
+            const metaOpcional = rendaTotal * 0.30;
+            const percentOpcional = metaOpcional > 0 ? (gastosPorCategoria.opcional / metaOpcional) * 100 : 0;
+            updateCircleProgress(circleOpcional, percentOpcional, 'var(--cor-opcional)');
+            const metaInvestimento = rendaTotal * 0.20;
+            const percentInvestimento = metaInvestimento > 0 ? (gastosPorCategoria.investimento / metaInvestimento) * 100 : 0;
+            updateCircleProgress(circleInvestimento, percentInvestimento, 'var(--cor-investimento)');
+        } else {
+            [circleEssencial, circleOpcional, circleInvestimento].forEach(circle => updateCircleProgress(circle, 0, 'var(--cor-borda-cinza)'));
+        }
+    }
+
+    function toggleDashboard() {
+        orcamentoVisual.classList.toggle('ativo');
+    }
+
+    function handleListClick(e) {
+        const targetButton = e.target.closest('button');
+        if (!targetButton) return;
+
+        const id = parseInt(targetButton.dataset.id);
+        if (targetButton.classList.contains('btn-delete')) {
+            excluirTransacao(id);
+        } else if (targetButton.classList.contains('btn-edit')) {
+            iniciarEdicao(id);
+        }
+    }
+
+    // --- Função de Inicialização ---
+    function init() {
+        // --- Listeners de Login/Registro ---
+        formLogin.addEventListener('submit', handleLogin);
+        formRegister.addEventListener('submit', handleRegister);
+        formForgotPassword.addEventListener('submit', handleForgotPassword);
+        btnLogout.addEventListener('click', handleLogout);
+
+        const clearErrors = () => {
+            loginError.textContent = '';
+            registerError.textContent = '';
+            forgotError.textContent = '';
+        };
+
+        toggleToRegister.addEventListener('click', () => {
+            formLogin.style.display = 'none';
+            formForgotPassword.style.display = 'none';
+            formRegister.style.display = 'flex';
+            clearErrors();
+        });
+        toggleToLogin.addEventListener('click', () => {
+            formRegister.style.display = 'none';
+            formForgotPassword.style.display = 'none';
+            formLogin.style.display = 'flex';
+            clearErrors();
+        });
+        toggleToForgot.addEventListener('click', () => {
+            formLogin.style.display = 'none';
+            formRegister.style.display = 'none';
+            formForgotPassword.style.display = 'flex';
+            clearErrors();
+        });
+        toggleToLoginFromForgot.addEventListener('click', () => {
+            formForgotPassword.style.display = 'none';
+            formRegister.style.display = 'none';
+            formLogin.style.display = 'flex';
+            clearErrors();
+        });
+
+
+        // --- Listeners do App Principal ---
+        btnDefinirRenda.addEventListener('click', definirRenda);
+        btnResetar.addEventListener('click', () => resetarMes(true));
+        balancoCircle.addEventListener('click', () => {
+            toggleDashboard();
+            if (orcamentoVisual.classList.contains('ativo')) {
+                animarBordasPequenas();
+            }
+        });
+        btnCancelEdit.addEventListener('click', cancelarEdicao);
+        form.addEventListener('submit', handleFormSubmit);
+        listaTransacoes.addEventListener('click', handleListClick);
+
+        buscaInput.addEventListener('input', filtrarDespesas);
+        filtroDia.addEventListener('input', filtrarDespesas);
+        filtroMes.addEventListener('input', filtrarDespesas);
+        filtroAno.addEventListener('input', filtrarDespesas);
+
+        categoriaSelect.addEventListener('change', () => {
+            categoriaSelect.className = categoriaSelect.value;
+        });
+
+        document.querySelectorAll('.btn-edit svg path').forEach(p => p.setAttribute('fill', 'none'));
+        document.querySelectorAll('.btn-delete svg path, .btn-delete svg polyline, .btn-delete svg line').forEach(p => p.setAttribute('fill', 'none'));
+
+        // --- Verifica o estado de Login ---
+        const loggedInUser = localStorage.getItem(CURRENT_USER_KEY);
+        if (loggedInUser) {
+            showAppScreen(loggedInUser);
+        } else {
+            showLoginScreen();
+        }
+    }
+
+    init(); // Inicia a aplicação
+
+});
+    </script>
+</body>
+</html>
