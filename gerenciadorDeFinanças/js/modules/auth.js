@@ -1,8 +1,9 @@
-
+// js/modules/auth.js
 import * as Data from './data.js';
 import * as UI from './ui.js';
 import * as Dashboard from './dashboard.js';
 import * as Transactions from './transactions.js';
+import * as API from './api.js';
 
 // --- Seletores de Login/Registro ---
 const formLogin = document.getElementById('form-login');
@@ -50,6 +51,7 @@ export function handleRegister(e) {
         return;
     }
 
+    // Registro sempre Local por enquanto (simulação)
     let users = JSON.parse(localStorage.getItem(Data.USERS_DB_KEY)) || [];
 
     if (users.find(user => user.username === username)) {
@@ -68,28 +70,43 @@ export function handleRegister(e) {
     showAuthForm(formLogin);
 }
 
-export function handleLogin(e) {
+export async function handleLogin(e) {
     e.preventDefault();
     const identifier = loginIdentifierInput.value;
     const password = loginPasswordInput.value;
 
-    let users = JSON.parse(localStorage.getItem(Data.USERS_DB_KEY)) || [];
+    // 1. Tenta Login via API
+    const apiUser = await API.loginUser(identifier, password);
+    
+    if (apiUser) {
+        // Sucesso API
+        loginSuccess(apiUser.username || apiUser.name || identifier);
+        return;
+    }
 
-    const user = users.find(user =>
+    // 2. Fallback: Login Local (se API falhar ou não achar)
+    console.log("Tentando login local...");
+    let users = JSON.parse(localStorage.getItem(Data.USERS_DB_KEY)) || [];
+    const localUser = users.find(user =>
         (user.email === identifier || user.username === identifier)
     );
 
-    if (user && user.password === password) {
-        // SUCESSO
-        Data.setStorageKey(user.username);
-        const { rendaTotal, transacoes } = Data.loadData();
-        UI.showAppScreen(user.username, rendaTotal, transacoes);
-        Dashboard.atualizarTudo();
-        Transactions.filtrarDespesas();
+    if (localUser && localUser.password === password) {
+        loginSuccess(localUser.username);
     } else {
-        // Falha
         loginError.textContent = 'Email, usuário ou senha inválidos.';
     }
+}
+
+async function loginSuccess(username) {
+    Data.setCurrentUser(username);
+    
+    // Carrega dados (agora a função loadData decide se usa API ou Local)
+    const { rendaTotal, transacoes } = await Data.loadData();
+    
+    UI.showAppScreen(username, rendaTotal, transacoes);
+    Dashboard.atualizarTudo();
+    Transactions.filtrarDespesas();
 }
 
 export function handleForgotPassword(e) {
@@ -122,6 +139,7 @@ export function handleForgotPassword(e) {
 
 export function handleLogout() {
     localStorage.removeItem(Data.CURRENT_USER_KEY);
+    API.setToken(null); // Limpa token da API
     
     // Limpa o estado e a UI
     Data.clearState();
@@ -137,11 +155,15 @@ export function handleLogout() {
     UI.showLoginScreen();
 }
 
-export function checkLoginStatus() {
+export async function checkLoginStatus() {
     const loggedInUser = localStorage.getItem(Data.CURRENT_USER_KEY);
     if (loggedInUser) {
-        Data.setStorageKey(loggedInUser);
-        const { rendaTotal, transacoes } = Data.loadData();
+        // Restaura token se existir
+        const token = localStorage.getItem("token");
+        if (token) API.setToken(token);
+
+        Data.setCurrentUser(loggedInUser);
+        const { rendaTotal, transacoes } = await Data.loadData();
         UI.showAppScreen(loggedInUser, rendaTotal, transacoes);
         Dashboard.atualizarTudo();
         Transactions.filtrarDespesas();
